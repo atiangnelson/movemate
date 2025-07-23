@@ -41,3 +41,4 @@ function Login({ setIsLoggedIn }) {
     </form>
   )
 }
+export default Login;
