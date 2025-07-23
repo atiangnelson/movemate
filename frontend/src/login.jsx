@@ -16,4 +16,9 @@ function Login({ setIsLoggedIn }) {
         navigate("/dashboard");
     }
   };
-  
+  return(
+    <form className="auth-form" onSubmit={handleSubmit}>
+        
+    </form>
+  )
+}
