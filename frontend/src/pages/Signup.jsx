@@ -5,6 +5,8 @@ function Signup() {
     };
     return(
         <div className="form-container">
+            <h2>Sign Up</h2>
+
 
         </div>
 
