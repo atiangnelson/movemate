@@ -28,7 +28,13 @@ function Login({ setIsLoggedIn }) {
             required
         />
         <input
-        type="password"
+            type="passward"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+        
         />
         
 
