@@ -9,8 +9,17 @@ import './App.css';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   return (
-    
+    <Router>
+      <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </Router>
   );
 }
 
