@@ -27,6 +27,9 @@ function Login({ setIsLoggedIn }) {
             onChange={handleChange}
             required
         />
+        <input
+        type="password"
+        />
         
 
     </form>
