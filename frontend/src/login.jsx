@@ -22,6 +22,13 @@ function Login({ setIsLoggedIn }) {
         <input 
             type="email"
             name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+        />
+        <input
+        type="password"
         />
         
 
