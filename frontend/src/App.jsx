@@ -5,16 +5,12 @@ import Login from "./pages/login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import { useState } from "react";
-
-
-
 import './App.css';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   return (
-    <div>
-
-    </div>
+    
   );
 }
 
