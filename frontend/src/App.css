@@ -101,3 +101,14 @@
     font-size: 0.95rem;
   }
 }
+
+.page-section {
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .page-section {
+    padding: 1rem;
+  }
+}
+
