@@ -1,1 +1,7 @@
-function Signup()
+function Signup() {
+    const handleSubmit = (e) => {
+        
+
+    };
+  
+}
