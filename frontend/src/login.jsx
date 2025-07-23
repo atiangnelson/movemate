@@ -12,3 +12,4 @@ function Login({ setIsLoggedIn }) {
   const handleSubmit = (e) => {
     e.preventDefault();
      if (formData.email && formData.password) {
+        setIsLoggedIn(true);
