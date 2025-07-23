@@ -13,3 +13,7 @@ function Login({ setIsLoggedIn }) {
     e.preventDefault();
      if (formData.email && formData.password) {
         setIsLoggedIn(true);
+        navigate("/dashboard");
+    }
+  };
+  
