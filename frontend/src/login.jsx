@@ -10,3 +10,4 @@ function Login({ setIsLoggedIn }) {
   };
 
   const handleSubmit = (e) => {
+    e.preventDefault();
