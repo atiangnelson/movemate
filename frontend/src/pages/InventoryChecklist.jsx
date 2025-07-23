@@ -9,5 +9,6 @@ function InventoryChecklist() {
     </div>
 
   );
-
 }
+
+export default InventoryChecklist;
