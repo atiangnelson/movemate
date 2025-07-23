@@ -18,7 +18,9 @@ function Login({ setIsLoggedIn }) {
   };
   return(
     <form className="auth-form" onSubmit={handleSubmit}>
+        <h2>Login</h2>
         
+
     </form>
   )
 }
