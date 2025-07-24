@@ -6,3 +6,4 @@ function BookingConfirmation() {
     </section>
   );
 }
+export default BookingConfirmation;
