@@ -18,26 +18,37 @@ function Login({ setIsLoggedIn }) {
   };
 
   return (
-    <form className="auth-form" onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        value={formData.email}
-        onChange={handleChange}
-        required
-      />
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={formData.password}
-        onChange={handleChange}
-        required
-      />
-      <button type="submit">Login</button>
-    </form>
+   <div className="auth-container">
+  <div className="auth-logo">
+    <img src="/your-truck-logo.png" alt="Logo" style={{ width: '60%', height: '60%' }} />
+  </div>
+  <h2 className="auth-title">Login To MoveMate</h2>
+
+  <input
+    className="auth-input"
+    type="text"
+    placeholder="email/username"
+    name="username"
+  />
+  <input
+    className="auth-input"
+    type="password"
+    placeholder="password"
+    name="password"
+  />
+
+  <button className="auth-button">LOGIN</button>
+
+  <p className="auth-footer-text">
+    Don’t have an account?
+    <a href="/signup"> Sign Up</a>
+  </p>
+  <p className="auth-footer-text">
+    Already have an account?
+    <a href="/login"> Login</a>
+  </p>
+</div>
+
   );
 }
 

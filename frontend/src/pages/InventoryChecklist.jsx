@@ -1,13 +1,17 @@
 function InventoryChecklist() {
-    return (
-    <div className="form-container"> 
-     <h2>Inventory Checklist</h2> 
+  return (
+    <div className="inventory-container"> 
+      <h2>Inventory Checklist</h2> 
       <form>
-        <textarea placeholder="List your items here..." required></textarea>
-        <button type="submit" className="button-primary">Save Checklist</button>
+        <textarea
+          className="auth-input"
+          placeholder="List your items here..."
+          required
+          rows={6}
+        ></textarea>
+        <button type="submit" className="auth-button">Save Checklist</button>
       </form>
     </div>
-
   );
 }
 
