@@ -1,40 +1,14 @@
-function QuoteApproval(){
-    return(
-        <section className="page-section">
-            <h2>Quote Approval</h2>
-            <p>Your quote is ready. Please review and approve to proceed.</p>
-            <button className="button-primary">Approve Quote</button>
-        </section>
-    );
+function QuoteApproval() {
+  return (
+    <div className="page-container">
+      <h2>Quote Approval</h2>
+      <p>Estimated Cost: Ksh 12,500</p>
+      <button className="button-primary">Approve Quote</button>
+    </div>
+  );
 }
+
 export default QuoteApproval;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
