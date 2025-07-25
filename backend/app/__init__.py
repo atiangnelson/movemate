@@ -13,7 +13,7 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movemate.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["JWT_SECRET_KEY"] = "super-secret-key"
-    
+
     CORS(app)
     db.init_app(app)
     jwt.init_app(app)
@@ -23,3 +23,5 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+    
+    return app
