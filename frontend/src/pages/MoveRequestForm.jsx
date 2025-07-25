@@ -1,6 +1,6 @@
 function MoveRequestForm() {
     return (
-        <div ></div>
+        <div className="form-container"></div>
     )
 
 }
