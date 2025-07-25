@@ -10,7 +10,7 @@ import InventoryChecklist from "./pages/InventoryChecklist";
 import QuoteApproval from "./pages/QuoteApproval";
 import BookingConfirmation from "./pages/BookingConfirmation";
 import Profile from './pages/Profile';
-import Notifications from './pages/Notifications';
+import Notifications from './pages/ Notifications';
 import AdminPanel from "./pages/AdminPanel";
 import { useState } from "react";
 import './App.css';
