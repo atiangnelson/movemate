@@ -12,4 +12,5 @@ function MoveRequestForm() {
     );
 }
 
+export default MoveRequestForm;
 
