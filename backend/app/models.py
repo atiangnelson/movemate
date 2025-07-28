@@ -11,3 +11,4 @@ class MoveRequest(db.Model):
     to_location = db.Column(db.String(200))
     move_date = db.Column(db.String(50))
 class InventoryChecklist(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
