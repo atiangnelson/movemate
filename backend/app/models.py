@@ -23,4 +23,5 @@ class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(db.Integer)
+    confirmed = db.Column(db.Boolean, default=False)
 
