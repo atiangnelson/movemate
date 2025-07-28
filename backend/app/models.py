@@ -4,3 +4,4 @@ class User(db.Model):
     full_name = db.Column(db.String(100))
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(200))
+class MoveRequest(db.Model):
