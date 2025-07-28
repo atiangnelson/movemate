@@ -14,5 +14,6 @@ class InventoryChecklist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
     items = db.Column(db.Text)
+class QuoteApproval(db.Model):
 
 
