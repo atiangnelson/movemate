@@ -19,5 +19,6 @@ class QuoteApproval(db.Model):
     user_id = db.Column(db.Integer)
     quote_amount = db.Column(db.Float)
     is_approved = db.Column(db.Boolean, default=False)
+class Booking(db.Model):
 
 
