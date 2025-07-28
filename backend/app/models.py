@@ -13,4 +13,6 @@ class MoveRequest(db.Model):
 class InventoryChecklist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
+    items = db.Column(db.Text)
+
 
