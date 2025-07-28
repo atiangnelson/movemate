@@ -7,3 +7,5 @@ class User(db.Model):
 class MoveRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
+    from_location = db.Column(db.String(200))
+    to_location = db.Column(db.String(200))
