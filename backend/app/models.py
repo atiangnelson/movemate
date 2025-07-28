@@ -10,3 +10,4 @@ class MoveRequest(db.Model):
     from_location = db.Column(db.String(200))
     to_location = db.Column(db.String(200))
     move_date = db.Column(db.String(50))
+class InventoryChecklist(db.Model):
