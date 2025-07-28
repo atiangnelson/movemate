@@ -9,3 +9,4 @@ class MoveRequest(db.Model):
     user_id = db.Column(db.Integer)
     from_location = db.Column(db.String(200))
     to_location = db.Column(db.String(200))
+    move_date = db.Column(db.String(50))
