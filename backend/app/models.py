@@ -1,4 +1,10 @@
-from . import db
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).parent.parent))  # Adjust if needed
+
+
+from app import db
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     full_name = db.Column(db.String(100))
