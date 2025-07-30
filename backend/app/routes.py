@@ -26,5 +26,11 @@ def signup():
         print("Email error:",e)
 
     return jsonify({"message":"User created succesfully"})
+
+@main.route("/login",methods=["POST"])
+def login():
+    data = request.get_json()
+    user = User.query.filter_by(email=data["email"]).first()
     
+
 
