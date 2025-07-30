@@ -11,4 +11,12 @@ main = Blueprint("main" , __name__)
 @main.route("/signup" , methods=["POST"])
 def signup():
     data = request.get_json()
-    
+    hashed_pw = generate_password_hash(data["password"])
+    new_user = user (
+        full_name = data["full_name"],
+        email = data["email"],
+        password=hashed_pw
+    )
+    db.session.add(new_user)
+    db.session.commit()
+
