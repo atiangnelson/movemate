@@ -20,3 +20,11 @@ def signup():
     db.session.add(new_user)
     db.session.commit()
 
+    try:
+        send_email(data["email"],"Welcome to MoveMate","Thank You For Signing Up," + data["full_name"] + "!")
+    except Exception as e:
+        print("Email error:",e)
+
+    return jsonify({"message":"User created succesfully"})
+    
+
