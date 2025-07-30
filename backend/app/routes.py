@@ -37,5 +37,15 @@ def login():
     else:
         return jsonify({"message":"Invalid Credentials"}), 401
 
-
-
+@main.route("/move-request", methods=["POST"])
+@jwt_required()
+def move_request():
+    data = request.get_json()
+    user_id = get_jwt_identity()["id"]
+    request_entry =MoveRequest(
+        user_id=user_id
+        from_location=data["from_location"],
+        to_location=data["to_location"],
+        move_date=data["move_date"]
+    )
+    
