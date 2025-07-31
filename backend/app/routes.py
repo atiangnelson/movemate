@@ -167,6 +167,23 @@ def get_notifications():
         })
     return jsonify(output)
 
+@main.route("/my-booking", methods=["GET"])
+@jwt_required()
+def get_my_booking():
+    user_id = get_jwt_identity()["id"]
+    booking = Booking.query.filter_by(user_id=user_id).first()
+    if not booking:
+        return jsonify({"message": "No booking found"}), 404
+
+    return jsonify({
+        "id": booking.id,
+        "confirmed": booking.confirmed,
+        "date": booking.date.strftime("%Y-%m-%d") if booking.date else "Not set"
+    })
+
+
+
+
 
 
 def send_email(to, subject, content):
