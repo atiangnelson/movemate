@@ -17,3 +17,12 @@ export async function signup(full_name, email, password) {
   });
   return res.json();
 }
+
+export async function getInventory(token) {
+  const res = await fetch(`${API_BASE_URL}/inventory`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+  return res.json();
+}
