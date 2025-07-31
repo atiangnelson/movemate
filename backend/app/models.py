@@ -32,4 +32,5 @@ class Booking(db.Model):
 
     user_id = db.Column(db.Integer)
     confirmed = db.Column(db.Boolean, default=False)
+    date = db.Column(db.Date, default=datetime.utcnow) 
 

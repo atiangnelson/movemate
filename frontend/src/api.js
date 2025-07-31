@@ -127,3 +127,17 @@ export async function getAllAdminQuotes(token) {
   if (!res.ok) throw new Error("Failed to fetch admin quotes");
   return res.json();
 }
+
+export async function getMyBooking(token) {
+  const res = await fetch(`${API_BASE_URL}/my-booking`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  if (!res.ok) {
+    throw new Error("No booking found");
+  }
+
+  return res.json();
+}
