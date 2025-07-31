@@ -48,4 +48,7 @@ def move_request():
         to_location=data["to_location"],
         move_date=data["move_date"]
     )
+    db.session.add(request_entry)
+    db.session.commit()
+    return jsonify({"message": "Move request submitted"})
 
