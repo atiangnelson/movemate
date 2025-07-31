@@ -74,3 +74,6 @@ def quote():
         user_id=user_id,
         quote_amount=data["quote_amount"]
     )
+    db.session.add(quote)
+    db.session.commit()
+    return jsonify({"message" : "Quote submitted"})
