@@ -183,6 +183,25 @@ def get_my_booking():
         "date": booking.date.strftime("%Y-%m-%d") if booking.date else "Not set"
     })
 
+@main.route("/profile", methods=["GET"])
+@jwt_required()
+def get_profile():
+    identity = get_jwt_identity()
+    user_id = identity["id"]
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    return jsonify({
+        "id": user.id,
+        "full_name": user.full_name,
+        "email": user.email
+    })
+
+
+
+
 
 
 
