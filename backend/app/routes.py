@@ -32,26 +32,33 @@ def login():
     data = request.get_json()
     user = User.query.filter_by(email=data["email"]).first()
     if user and check_password_hash(user.password, data["password"]):
-        token = create_access_token(identity={"id": user.id, "name": user.full_name})
+        token = create_access_token(identity={
+            "id": user.id,
+            "name": user.full_name,
+            "is_admin": user.is_admin
+        })
         return jsonify({"message": f"Welcome {user.full_name}", "token": token})
     else:
         return jsonify({"message":"Invalid Credentials"}), 401
 
-@main.route("/move-request", methods=["POST"])
+
+@main.route('/move-request', methods=['POST'])
 @jwt_required()
-def move_request():
+def create_move_request():
     data = request.get_json()
     user_id = get_jwt_identity()["id"]
-    request_entry =MoveRequest(
-        user_id=user_id,
-        from_location=data["from_location"],
-        to_location=data["to_location"],
-        move_date=data["move_date"]
-    )
-    db.session.add(request_entry)
-    db.session.commit()
-    return jsonify({"message": "Move request submitted"})
 
+    move = MoveRequest(
+        user_id=user_id,
+        full_name=data.get("full_name"),
+        location=data.get("location"),
+        date=data.get("date"),
+        inventory=data.get("inventory")
+    )
+    db.session.add(move)
+    db.session.commit()
+
+    return jsonify({"message": "Move request created successfully", "move_id": move.id}), 201
 @main.route("/inventory",methods=["POST"])
 @jwt_required()
 def inventory():
@@ -97,6 +104,89 @@ def book():
     db.session.add(booking)
     db.session.commit()
     return jsonify({"message" : "Booking confirmed"})
+
+
+@main.route("/admin/move-requests", methods=["GET"])
+@jwt_required()
+def get_all_move_requests():
+    move_requests = MoveRequest.query.all()
+    output = []
+    for req in move_requests:
+        output.append({
+            "id": req.id,
+            "user_id": req.user_id,
+            "from_location": req.from_location,
+            "to_location": req.to_location,
+            "move_date": req.move_date.strftime("%Y-%m-%d")
+        })
+    return jsonify(output)
+
+
+@main.route("/admin/quotes", methods=["GET"])
+@jwt_required()
+def get_all_quotes():
+    current_user = get_jwt_identity()
+
+    if not current_user.get("is_admin"):
+        return jsonify({"message": "Admins only"}), 403
+
+    quotes = QuoteApproval.query.all()
+    output = []
+    for quote in quotes:
+        output.append({
+            "id": quote.id,
+            "user_id": quote.user_id,
+            "quote_amount": quote.quote_amount,
+            "is_approved": quote.is_approved
+        })
+    return jsonify(output)
+
+
+@main.route("/admin/bookings", methods=["GET"])
+@jwt_required()
+def get_all_bookings():
+    bookings = Booking.query.all()
+    output = []
+    for book in bookings:
+        output.append({
+            "id": book.id,
+            "user_id": book.user_id,
+            "confirmed": book.confirmed
+        })
+    return jsonify(output)
+
+@main.route("/notifications", methods=["GET"])
+@jwt_required()
+def get_notifications():
+    user_id = get_jwt_identity()["id"]
+    notifications = Notification.query.filter_by(user_id=user_id).all()
+    output = []
+    for notif in notifications:
+        output.append({
+            "id": notif.id,
+            "message": notif.message,
+            "timestamp": notif.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        })
+    return jsonify(output)
+
+@main.route("/my-booking", methods=["GET"])
+@jwt_required()
+def get_my_booking():
+    user_id = get_jwt_identity()["id"]
+    booking = Booking.query.filter_by(user_id=user_id).first()
+    if not booking:
+        return jsonify({"message": "No booking found"}), 404
+
+    return jsonify({
+        "id": booking.id,
+        "confirmed": booking.confirmed,
+        "date": booking.date.strftime("%Y-%m-%d") if booking.date else "Not set"
+    })
+
+
+
+
+
 
 def send_email(to, subject, content):
     msg = EmailMessage()

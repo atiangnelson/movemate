@@ -79,3 +79,65 @@ export async function saveInventory(itemsText, token) {
   return res.json();
 }
 
+export async function getProfile(token) {
+  const res = await fetch(`${API_BASE_URL}/profile`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+  return res.json();
+}
+
+export async function updateProfile(data, token) {
+  const res = await fetch(`${API_BASE_URL}/profile`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+export async function getNotifications(token) {
+  const res = await fetch(`${API_BASE_URL}/notifications`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+  return res.json();
+}
+
+export async function getQuoteByUser(userId, token) {
+  const res = await fetch(`${API_BASE_URL}/quotes/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Quote fetch failed");
+  return res.json();
+}
+
+export async function getAllAdminQuotes(token) {
+  const res = await fetch(`${API_BASE_URL}/admin/quotes`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  if (!res.ok) throw new Error("Failed to fetch admin quotes");
+  return res.json();
+}
+
+export async function getMyBooking(token) {
+  const res = await fetch(`${API_BASE_URL}/my-booking`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  if (!res.ok) {
+    throw new Error("No booking found");
+  }
+
+  return res.json();
+}
