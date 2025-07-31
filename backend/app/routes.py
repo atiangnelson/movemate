@@ -217,15 +217,6 @@ def update_profile():
 
     return jsonify({"message": "Profile updated successfully"})
 
-
-
-
-
-
-
-
-
-
 def send_email(to, subject, content):
     msg = EmailMessage()
     msg["Subject"] = subject
