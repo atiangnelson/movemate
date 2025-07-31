@@ -47,3 +47,13 @@ export async function getUserQuotes(token) {
   });
   return res.json();
 }
+
+export async function approveQuote(quoteId, token) {
+  const res = await fetch(`${API_BASE_URL}/quotes/${quoteId}/approve`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+  return res.json();
+}
