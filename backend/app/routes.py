@@ -153,6 +153,21 @@ def get_all_bookings():
         })
     return jsonify(output)
 
+@main.route("/notifications", methods=["GET"])
+@jwt_required()
+def get_notifications():
+    user_id = get_jwt_identity()["id"]
+    notifications = Notification.query.filter_by(user_id=user_id).all()
+    output = []
+    for notif in notifications:
+        output.append({
+            "id": notif.id,
+            "message": notif.message,
+            "timestamp": notif.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        })
+    return jsonify(output)
+
+
 
 def send_email(to, subject, content):
     msg = EmailMessage()
