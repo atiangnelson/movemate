@@ -94,7 +94,9 @@ def approve_quote():
 def book():
     user_id = get_jwt_identity()["id"]
     booking = Booking(user_id=user_id, confirmed=True)
-    
+    db.session.add(booking)
+    db.session.commit()
+    return jsonify({"message" : "Booking confirmed"})
 
    
    
