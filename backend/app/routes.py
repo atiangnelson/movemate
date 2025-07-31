@@ -199,6 +199,25 @@ def get_profile():
         "email": user.email
     })
 
+    @main.route("/profile", methods=["PUT"])
+@jwt_required()
+def update_profile():
+    identity = get_jwt_identity()
+    user_id = identity["id"]
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    data = request.json
+    user.full_name = data.get("full_name", user.full_name)
+    user.email = data.get("email", user.email)
+
+    db.session.commit()
+
+    return jsonify({"message": "Profile updated successfully"})
+
+
 
 
 
