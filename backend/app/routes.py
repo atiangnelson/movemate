@@ -56,7 +56,7 @@ def move_request():
 @jwt_required()
 def inventory():
     data = request.get_json()
-    user_id - get_jwt_identity()["id"]
+    user_id =  get_jwt_identity()["id"]
     entry = InventoryChecklist(
         user_id=user_id,
         items=data["items"]
