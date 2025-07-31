@@ -116,3 +116,14 @@ export async function getQuoteByUser(userId, token) {
   if (!res.ok) throw new Error("Quote fetch failed");
   return res.json();
 }
+
+export async function getAllAdminQuotes(token) {
+  const res = await fetch(`${API_BASE_URL}/admin/quotes`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  if (!res.ok) throw new Error("Failed to fetch admin quotes");
+  return res.json();
+}
