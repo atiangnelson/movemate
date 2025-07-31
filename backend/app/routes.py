@@ -77,3 +77,9 @@ def quote():
     db.session.add(quote)
     db.session.commit()
     return jsonify({"message" : "Quote submitted"})
+
+@main.route("/quote/approve",methods=["PUT"])
+@jwt_required()
+def approve_quote():
+    data = request.get_json()
+    quote = QuoteApproval.query.get(data["quote_id"])
