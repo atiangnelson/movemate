@@ -98,5 +98,14 @@ def book():
     db.session.commit()
     return jsonify({"message" : "Booking confirmed"})
 
-   
+def send_email(to, subject, content):
+    msg = EmailMessage()
+    msg["Subject"] = subject
+    msg["From"] = "noreply@movemate.com"
+    msg["To"] = to
+    msg.set_content(content)
+
+    with smtplib.SMTP("localhost") as server:
+        server.send_message(msg)
+
    
