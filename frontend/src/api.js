@@ -79,3 +79,40 @@ export async function saveInventory(itemsText, token) {
   return res.json();
 }
 
+export async function getProfile(token) {
+  const res = await fetch(`${API_BASE_URL}/profile`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+  return res.json();
+}
+
+export async function updateProfile(data, token) {
+  const res = await fetch(`${API_BASE_URL}/profile`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+export async function getNotifications(token) {
+  const res = await fetch(`${API_BASE_URL}/notifications`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+  return res.json();
+}
+
+export async function getQuoteByUser(userId, token) {
+  const res = await fetch(`${API_BASE_URL}/quotes/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Quote fetch failed");
+  return res.json();
+}
