@@ -57,3 +57,12 @@ export async function approveQuote(quoteId, token) {
   });
   return res.json();
 }
+
+export async function getBookings(token) {
+  const res = await fetch(`${API_BASE_URL}/bookings`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+  return res.json();
+}
