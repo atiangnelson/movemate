@@ -12,7 +12,7 @@ main = Blueprint("main" , __name__)
 def signup():
     data = request.get_json()
     hashed_pw = generate_password_hash(data["password"])
-    new_user = user (
+    new_user = User(
         full_name = data["full_name"],
         email = data["email"],
         password=hashed_pw
@@ -26,5 +26,29 @@ def signup():
         print("Email error:",e)
 
     return jsonify({"message":"User created succesfully"})
-    
+
+@main.route("/login",methods=["POST"])
+def login():
+    data = request.get_json()
+    user = User.query.filter_by(email=data["email"]).first()
+    if user and check_password_hash(user.password, data["password"]):
+        token = create_access_token(identity={"id": user.id, "name": user.full_name})
+        return jsonify({"message": f"Welcome {user.full_name}", "token": token})
+    else:
+        return jsonify({"message":"Invalid Credentials"}), 401
+
+@main.route("/move-request", methods=["POST"])
+@jwt_required()
+def move_request():
+    data = request.get_json()
+    user_id = get_jwt_identity()["id"]
+    request_entry =MoveRequest(
+        user_id=user_id,
+        from_location=data["from_location"],
+        to_location=data["to_location"],
+        move_date=data["move_date"]
+    )
+    db.session.add(request_entry)
+    db.session.commit()
+    return jsonify({"message": "Move request submitted"})
 
