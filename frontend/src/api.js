@@ -39,3 +39,11 @@ export async function submitMoveRequest(data, token) {
   return res.json();
 }
 
+export async function getUserQuotes(token) {
+  const res = await fetch(`${API_BASE_URL}/quotes`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+  return res.json();
+}
