@@ -26,3 +26,16 @@ export async function getInventory(token) {
   });
   return res.json();
 }
+
+export async function submitMoveRequest(data, token) {
+  const res = await fetch(`${API_BASE_URL}/move-request`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
