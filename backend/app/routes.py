@@ -42,21 +42,23 @@ def login():
         return jsonify({"message":"Invalid Credentials"}), 401
 
 
-@main.route("/move-request", methods=["POST"])
+@main.route('/move-request', methods=['POST'])
 @jwt_required()
-def move_request():
+def create_move_request():
     data = request.get_json()
     user_id = get_jwt_identity()["id"]
-    request_entry =MoveRequest(
-        user_id=user_id,
-        from_location=data["from_location"],
-        to_location=data["to_location"],
-        move_date=data["move_date"]
-    )
-    db.session.add(request_entry)
-    db.session.commit()
-    return jsonify({"message": "Move request submitted"})
 
+    move = MoveRequest(
+        user_id=user_id,
+        full_name=data.get("full_name"),
+        location=data.get("location"),
+        date=data.get("date"),
+        inventory=data.get("inventory")
+    )
+    db.session.add(move)
+    db.session.commit()
+
+    return jsonify({"message": "Move request created successfully", "move_id": move.id}), 201
 @main.route("/inventory",methods=["POST"])
 @jwt_required()
 def inventory():

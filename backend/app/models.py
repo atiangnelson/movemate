@@ -15,9 +15,11 @@ class User(db.Model):
 class MoveRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
-    from_location = db.Column(db.String(200))
-    to_location = db.Column(db.String(200))
-    move_date = db.Column(db.String(50))
+    full_name = db.Column(db.String(120))
+    location = db.Column(db.String(200))
+    date = db.Column(db.String(20))
+    inventory = db.Column(db.Text)
+
 class InventoryChecklist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
