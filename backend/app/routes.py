@@ -52,3 +52,34 @@ def move_request():
     db.session.commit()
     return jsonify({"message": "Move request submitted"})
 
+@main.route("/inventory",methods=["POST"])
+@jwt_required()
+def inventory():
+    data = request.get_json()
+    user_id =  get_jwt_identity()["id"]
+    entry = InventoryChecklist(
+        user_id=user_id,
+        items=data["items"]
+    )
+    db.session.add(entry)
+    db.session.commit()
+    return jsonify({"message" : "Inventory saved"})
+
+@main.route("/quote",methods=["POST"])
+@jwt_required()
+def quote():
+    data = request.get_json()
+    user_id = get_jwt_identity()["id"]
+    quote = QuoteApproval(
+        user_id=user_id,
+        quote_amount=data["quote_amount"]
+    )
+    db.session.add(quote)
+    db.session.commit()
+    return jsonify({"message" : "Quote submitted"})
+
+@main.route("/quote/approve",methods=["PUT"])
+@jwt_required()
+def approve_quote():
+    data = request.get_json()
+    quote = QuoteApproval.query.get(data["quote_id"])
