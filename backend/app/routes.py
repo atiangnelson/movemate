@@ -52,3 +52,13 @@ def move_request():
     db.session.commit()
     return jsonify({"message": "Move request submitted"})
 
+@main.route("/inventory",methods=["POST"])
+@jwt_required()
+def inventory():
+    data = request.get_json()
+    user_id - get_jwt_identity()["id"]
+    entry = InventoryChecklist(
+        user_id=user_id,
+        items=data["items"]
+    )
+    
