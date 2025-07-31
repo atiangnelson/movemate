@@ -32,10 +32,15 @@ def login():
     data = request.get_json()
     user = User.query.filter_by(email=data["email"]).first()
     if user and check_password_hash(user.password, data["password"]):
-        token = create_access_token(identity={"id": user.id, "name": user.full_name})
+        token = create_access_token(identity={
+            "id": user.id,
+            "name": user.full_name,
+            "is_admin": user.is_admin
+        })
         return jsonify({"message": f"Welcome {user.full_name}", "token": token})
     else:
         return jsonify({"message":"Invalid Credentials"}), 401
+
 
 @main.route("/move-request", methods=["POST"])
 @jwt_required()
@@ -97,6 +102,57 @@ def book():
     db.session.add(booking)
     db.session.commit()
     return jsonify({"message" : "Booking confirmed"})
+
+
+@main.route("/admin/move-requests", methods=["GET"])
+@jwt_required()
+def get_all_move_requests():
+    move_requests = MoveRequest.query.all()
+    output = []
+    for req in move_requests:
+        output.append({
+            "id": req.id,
+            "user_id": req.user_id,
+            "from_location": req.from_location,
+            "to_location": req.to_location,
+            "move_date": req.move_date.strftime("%Y-%m-%d")
+        })
+    return jsonify(output)
+
+
+@main.route("/admin/quotes", methods=["GET"])
+@jwt_required()
+def get_all_quotes():
+    current_user = get_jwt_identity()
+
+    if not current_user.get("is_admin"):
+        return jsonify({"message": "Admins only"}), 403
+
+    quotes = QuoteApproval.query.all()
+    output = []
+    for quote in quotes:
+        output.append({
+            "id": quote.id,
+            "user_id": quote.user_id,
+            "quote_amount": quote.quote_amount,
+            "is_approved": quote.is_approved
+        })
+    return jsonify(output)
+
+
+@main.route("/admin/bookings", methods=["GET"])
+@jwt_required()
+def get_all_bookings():
+    bookings = Booking.query.all()
+    output = []
+    for book in bookings:
+        output.append({
+            "id": book.id,
+            "user_id": book.user_id,
+            "confirmed": book.confirmed
+        })
+    return jsonify(output)
+
 
 def send_email(to, subject, content):
     msg = EmailMessage()
