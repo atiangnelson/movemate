@@ -83,3 +83,10 @@ def quote():
 def approve_quote():
     data = request.get_json()
     quote = QuoteApproval.query.get(data["quote_id"])
+    if quote:
+        quote.is_approved = True
+        db.session.commit()
+        return jsonify({"message" : "Quote approved"})
+    return jsonify({"message": "Quote not found"}), 404
+   
+   
