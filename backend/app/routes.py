@@ -88,5 +88,13 @@ def approve_quote():
         db.session.commit()
         return jsonify({"message" : "Quote approved"})
     return jsonify({"message": "Quote not found"}), 404
+
+@main.route("/book",methods=["POST"])
+@jwt_required()
+def book():
+    user_id = get_jwt_identity()["id"]
+    booking = Booking(user_id=user_id, confirmed=True)
+    
+
    
    
