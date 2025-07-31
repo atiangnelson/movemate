@@ -66,3 +66,16 @@ export async function getBookings(token) {
   });
   return res.json();
 }
+
+export async function saveInventory(itemsText, token) {
+  const res = await fetch(`${API_BASE_URL}/inventory`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({ items: itemsText })
+  });
+  return res.json();
+}
+
