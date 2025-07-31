@@ -61,4 +61,6 @@ def inventory():
         user_id=user_id,
         items=data["items"]
     )
-    
+    db,session.add(entry)
+    db.session.commit()
+    return jsonify({"message" : "Inventory saved"})
