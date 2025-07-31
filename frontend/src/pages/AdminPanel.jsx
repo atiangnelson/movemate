@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAllMoveRequests, getAllQuotes, getAllBookings } from '../api';
+import { getAllMoveRequests, getAllAdminQuotes, getAllBookings } from '../api';
 
 const AdminPanel = () => {
   const [requests, setRequests] = useState([]);
@@ -13,7 +13,7 @@ const AdminPanel = () => {
       try {
         const [moveData, quoteData, bookingData] = await Promise.all([
           getAllMoveRequests(token),
-          getAllQuotes(token),
+          getAllAdminQuotes(token),
           getAllBookings(token),
         ]);
         setRequests(moveData);
@@ -36,7 +36,9 @@ const AdminPanel = () => {
         <h3>Move Requests</h3>
         <ul>
           {requests.map(req => (
-            <li key={req.id}>{req.full_name} — {req.location} — {req.date}</li>
+            <li key={req.id}>
+              {req.full_name} — {req.location} — {req.date}
+            </li>
           ))}
         </ul>
       </section>
@@ -46,7 +48,7 @@ const AdminPanel = () => {
         <ul>
           {quotes.map(quote => (
             <li key={quote.id}>
-              User {quote.user_id} — Ksh {quote.amount} — {quote.status}
+              User {quote.user_id} — Ksh {quote.quote_amount} — {quote.is_approved ? "✅ Approved" : "❌ Pending"}
             </li>
           ))}
         </ul>
