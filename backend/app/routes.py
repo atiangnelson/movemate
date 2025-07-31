@@ -64,3 +64,13 @@ def inventory():
     db.session.add(entry)
     db.session.commit()
     return jsonify({"message" : "Inventory saved"})
+
+@main.route("/quote",methods=["POST"])
+@jwt_required()
+def quote():
+    data = request.get_json()
+    user_id = get_jwt_identity()["id"]
+    quote = QuoteApproval(
+        user_id=user_id,
+        quote_amount=data["quote_amount"]
+    )
