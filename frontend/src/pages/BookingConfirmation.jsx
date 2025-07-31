@@ -32,9 +32,9 @@ const BookingConfirmation = () => {
           <p>
             <strong>Status:</strong>{' '}
             {booking.confirmed ? (
-              <span style={{ color: 'green' }}>Confirmed ✅</span>
+              <span style={{ color: 'green' }}>Confirmed </span>
             ) : (
-              <span style={{ color: 'orange' }}>Pending ⏳</span>
+              <span style={{ color: 'orange' }}>Pending </span>
             )}
           </p>
         </div>
