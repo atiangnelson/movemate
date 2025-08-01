@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:5000";
 
 export async function login(email, password) {
   const res = await fetch(`${API_BASE_URL}/login`, {
@@ -79,26 +79,8 @@ export async function saveInventory(itemsText, token) {
   return res.json();
 }
 
-export async function getProfile(token) {
-  const res = await fetch(`${API_BASE_URL}/profile`, {
-    headers: {
-      "Authorization": `Bearer ${token}`
-    }
-  });
-  return res.json();
-}
 
-export async function updateProfile(data, token) {
-  const res = await fetch(`${API_BASE_URL}/profile`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
-    body: JSON.stringify(data)
-  });
-  return res.json();
-}
+
 
 export async function getNotifications(token) {
   const res = await fetch(`${API_BASE_URL}/notifications`, {
@@ -143,7 +125,7 @@ export async function getMyBooking(token) {
 }
 
 export async function getProfile(token) {
-  const res = await fetch(`${BASE_URL}/profile`, {
+  const res = await fetch(`${API_BASE_URL}/profile`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -153,7 +135,7 @@ export async function getProfile(token) {
 }
 
 export async function updateProfile(data, token) {
-  const res = await fetch(`${BASE_URL}/profile`, {
+  const res = await fetch(`${API_BASE_URL}/profile`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -162,6 +144,38 @@ export async function updateProfile(data, token) {
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error("Failed to update profile");
+  return res.json();
+}
+
+
+export async function getAllMoveRequests(token) {
+  const res = await fetch(`${API_BASE_URL}/admin/move-requests`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch move requests");
+  return res.json();
+}
+
+export async function getAllBookings(token) {
+  const res = await fetch(`${API_BASE_URL}/admin/bookings`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch bookings");
+  return res.json();
+}
+
+export async function approveQuoteById(quoteId, token) {
+  const res = await fetch(`${API_BASE_URL}/admin/quotes/${quoteId}/approve`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to approve quote");
   return res.json();
 }
 
