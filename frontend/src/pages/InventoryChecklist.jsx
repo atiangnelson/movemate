@@ -1,71 +1,75 @@
-import React, { useEffect, useState } from "react";
-import { getInventory, saveInventory } from "../api";
-import { getToken } from "../utils/auth";
+import React, { useState, useEffect } from "react";
+import { getInventory, addInventoryItem, toggleInventoryItem } from "../api";
+import { useNavigate } from "react-router-dom";
 
-function InventoryChecklist() {
-  const [itemsText, setItemsText] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+const InventoryChecklist = () => {
+  const [items, setItems] = useState([]);
+  const [newItem, setNewItem] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchInventory = async () => {
-      const token = getToken();
-      if (!token) {
-        setError("Please log in to view your inventory.");
-        return;
-      }
+    const token = localStorage.getItem("token");
+    if (!token) return navigate("/login");
 
-      const res = await getInventory(token);
-      if (res.error) {
-        setError(res.error);
-      } else {
-        // Convert inventory items to text format
-        const lines = (res.items || []).map(
-          (item) => `${item.name} - Qty: ${item.quantity}`
+    getInventory(token)
+      .then(data => setItems(data))
+      .catch(err => console.error("Failed to fetch inventory", err));
+  }, [navigate]);
+
+  const handleAdd = () => {
+    const token = localStorage.getItem("token");
+    if (!newItem.trim()) return;
+
+    addInventoryItem({ name: newItem }, token)
+      .then(item => {
+        setItems(prev => [...prev, item]);
+        setNewItem("");
+      })
+      .catch(err => console.error("Failed to add item", err));
+  };
+
+  const handleToggle = (itemId) => {
+    const token = localStorage.getItem("token");
+
+    toggleInventoryItem(itemId, token)
+      .then(updatedItem => {
+        setItems(prev =>
+          prev.map(item => (item.id === itemId ? updatedItem : item))
         );
-        setItemsText(lines.join("\n"));
-      }
-    };
-
-    fetchInventory();
-  }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const token = getToken();
-    if (!token) {
-      setError("You must be logged in.");
-      return;
-    }
-
-    const res = await saveInventory(itemsText, token);
-    if (res.success) {
-      setMessage("Checklist saved successfully.");
-    } else {
-      setError(res.message || "Error saving checklist.");
-    }
+      })
+      .catch(err => console.error("Failed to toggle item", err));
   };
 
   return (
-    <div className="inventory-container"> 
-      <h2>Inventory Checklist</h2> 
+    <div className="container">
+      <h2>Inventory Checklist</h2>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {message && <p style={{ color: "green" }}>{message}</p>}
+      <div className="add-item">
+        <input
+          type="text"
+          placeholder="Add item..."
+          value={newItem}
+          onChange={e => setNewItem(e.target.value)}
+        />
+        <button onClick={handleAdd}>Add</button>
+      </div>
 
-      <form onSubmit={handleSubmit}>
-        <textarea
-          className="auth-input"
-          placeholder="List your items here..."
-          required
-          rows={6}
-          value={itemsText}
-          onChange={(e) => setItemsText(e.target.value)}
-        ></textarea>
-        <button type="submit" className="auth-button">Save Checklist</button>
-      </form>
+      <ul>
+        {items.map(item => (
+          <li
+            key={item.id}
+            style={{
+              textDecoration: item.completed ? "line-through" : "none",
+              cursor: "pointer"
+            }}
+            onClick={() => handleToggle(item.id)}
+          >
+            {item.name}
+          </li>
+        ))}
+      </ul>
     </div>
   );
-}
+};
 
 export default InventoryChecklist;

@@ -1,78 +1,77 @@
-from flask import Blueprint ,request, jsonify
-from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
-from werkzeug.security import generate_password_hash,check_password_hash
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
-from .models import User,MoveRequest,InventoryChecklist,QuoteApproval,Booking
-import smtplib 
+from .models import User, MoveRequest, InventoryChecklist, QuoteApproval, Booking
+import smtplib
+from .decorators import admin_required
 from email.message import EmailMessage
 
-main = Blueprint("main" , __name__)
+main = Blueprint("main", __name__)
 
-@main.route("/signup" , methods=["POST"])
+
+@main.route("/signup", methods=["POST"])
 def signup():
     data = request.get_json()
     hashed_pw = generate_password_hash(data["password"])
     new_user = User(
-        full_name = data["full_name"],
-        email = data["email"],
+        full_name=data["full_name"],
+        email=data["email"],
         password=hashed_pw
     )
     db.session.add(new_user)
     db.session.commit()
 
     try:
-        send_email(data["email"],"Welcome to MoveMate","Thank You For Signing Up," + data["full_name"] + "!")
+        send_email(data["email"], "Welcome to MoveMate", "Thank you for signing up, " + data["full_name"] + "!")
     except Exception as e:
-        print("Email error:",e)
+        print("Email error:", e)
 
-    return jsonify({"message":"User created succesfully"})
+    return jsonify({"message": "User created successfully"})
 
-@main.route("/login",methods=["POST"])
+
+@main.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
     user = User.query.filter_by(email=data["email"]).first()
     if user and check_password_hash(user.password, data["password"]):
-        token = create_access_token(identity={
-            "id": user.id,
-            "name": user.full_name,
-            "is_admin": user.is_admin
-        })
+        token = create_access_token(identity={"id": user.id, "name": user.full_name})
         return jsonify({"message": f"Welcome {user.full_name}", "token": token})
     else:
-        return jsonify({"message":"Invalid Credentials"}), 401
+        return jsonify({"message": "Invalid credentials"}), 401
 
 
-@main.route('/move-request', methods=['POST'])
+@main.route("/move-request", methods=["POST"])
 @jwt_required()
-def create_move_request():
+def move_request():
     data = request.get_json()
     user_id = get_jwt_identity()["id"]
-
-    move = MoveRequest(
+    request_entry = MoveRequest(
         user_id=user_id,
-        full_name=data.get("full_name"),
-        location=data.get("location"),
-        date=data.get("date"),
-        inventory=data.get("inventory")
+        from_location=data["from_location"],
+        to_location=data["to_location"],
+        move_date=data["move_date"]
     )
-    db.session.add(move)
+    db.session.add(request_entry)
     db.session.commit()
+    return jsonify({"message": "Move request submitted"})
 
-    return jsonify({"message": "Move request created successfully", "move_id": move.id}), 201
-@main.route("/inventory",methods=["POST"])
+
+@main.route("/inventory", methods=["POST"])
 @jwt_required()
 def inventory():
     data = request.get_json()
-    user_id =  get_jwt_identity()["id"]
+    user_id = get_jwt_identity()["id"]
     entry = InventoryChecklist(
         user_id=user_id,
         items=data["items"]
     )
     db.session.add(entry)
     db.session.commit()
-    return jsonify({"message" : "Inventory saved"})
+    return jsonify({"message": "Inventory saved"})
 
-@main.route("/quote",methods=["POST"])
+
+@main.route("/quote", methods=["POST"])
 @jwt_required()
 def quote():
     data = request.get_json()
@@ -83,9 +82,10 @@ def quote():
     )
     db.session.add(quote)
     db.session.commit()
-    return jsonify({"message" : "Quote submitted"})
+    return jsonify({"message": "Quote submitted"})
 
-@main.route("/quote/approve",methods=["PUT"])
+
+@main.route("/quote/approve", methods=["PUT"])
 @jwt_required()
 def approve_quote():
     data = request.get_json()
@@ -93,129 +93,148 @@ def approve_quote():
     if quote:
         quote.is_approved = True
         db.session.commit()
-        return jsonify({"message" : "Quote approved"})
+        return jsonify({"message": "Quote approved"})
     return jsonify({"message": "Quote not found"}), 404
 
-@main.route("/book",methods=["POST"])
+
+@main.route('/api/book/<int:quote_id>', methods=['POST'])
 @jwt_required()
-def book():
+def book_move(quote_id):
     user_id = get_jwt_identity()["id"]
-    booking = Booking(user_id=user_id, confirmed=True)
+    data = request.get_json()
+    date = data.get('date')
+    time = data.get('time')
+
+    quote = QuoteApproval.query.get_or_404(quote_id)
+    if quote.user_id != user_id or not quote.is_approved:
+        return jsonify({"error": "Unauthorized or quote not approved"}), 403
+
+    booking = Booking(quote_id=quote_id, date=date, time=time, user_id=user_id, confirmed=True)
     db.session.add(booking)
     db.session.commit()
-    return jsonify({"message" : "Booking confirmed"})
+    return jsonify({"message": "Booking successful"})
 
 
-@main.route("/admin/move-requests", methods=["GET"])
-@jwt_required()
-def get_all_move_requests():
-    move_requests = MoveRequest.query.all()
-    output = []
-    for req in move_requests:
-        output.append({
-            "id": req.id,
-            "user_id": req.user_id,
-            "from_location": req.from_location,
-            "to_location": req.to_location,
-            "move_date": req.move_date.strftime("%Y-%m-%d")
-        })
-    return jsonify(output)
+# ======== GET Routes for Dashboard =========
 
-
-@main.route("/admin/quotes", methods=["GET"])
-@jwt_required()
-def get_all_quotes():
-    current_user = get_jwt_identity()
-
-    if not current_user.get("is_admin"):
-        return jsonify({"message": "Admins only"}), 403
-
-    quotes = QuoteApproval.query.all()
-    output = []
-    for quote in quotes:
-        output.append({
-            "id": quote.id,
-            "user_id": quote.user_id,
-            "quote_amount": quote.quote_amount,
-            "is_approved": quote.is_approved
-        })
-    return jsonify(output)
-
-
-@main.route("/admin/bookings", methods=["GET"])
-@jwt_required()
-def get_all_bookings():
-    bookings = Booking.query.all()
-    output = []
-    for book in bookings:
-        output.append({
-            "id": book.id,
-            "user_id": book.user_id,
-            "confirmed": book.confirmed
-        })
-    return jsonify(output)
-
-@main.route("/notifications", methods=["GET"])
-@jwt_required()
-def get_notifications():
-    user_id = get_jwt_identity()["id"]
-    notifications = Notification.query.filter_by(user_id=user_id).all()
-    output = []
-    for notif in notifications:
-        output.append({
-            "id": notif.id,
-            "message": notif.message,
-            "timestamp": notif.timestamp.strftime("%Y-%m-%d %H:%M:%S")
-        })
-    return jsonify(output)
-
-@main.route("/my-booking", methods=["GET"])
-@jwt_required()
-def get_my_booking():
-    user_id = get_jwt_identity()["id"]
-    booking = Booking.query.filter_by(user_id=user_id).first()
-    if not booking:
-        return jsonify({"message": "No booking found"}), 404
-
-    return jsonify({
-        "id": booking.id,
-        "confirmed": booking.confirmed,
-        "date": booking.date.strftime("%Y-%m-%d") if booking.date else "Not set"
-    })
-
-@main.route("/profile", methods=["GET"])
+@main.route("/user/profile", methods=["GET"])
 @jwt_required()
 def get_profile():
-    identity = get_jwt_identity()
-    user_id = identity["id"]
+    user_id = get_jwt_identity()["id"]
     user = User.query.get(user_id)
-
-    if not user:
-        return jsonify({"error": "User not found"}), 404
-
     return jsonify({
         "id": user.id,
         "full_name": user.full_name,
         "email": user.email
     })
 
-    @main.route("/profile", methods=["PUT"])
+
+@main.route("/user/move-requests", methods=["GET"])
 @jwt_required()
-def update_profile():
-    identity = get_jwt_identity()
-    user_id = identity["id"]
-    user = User.query.get(user_id)
+def get_move_requests():
+    user_id = get_jwt_identity()["id"]
+    requests = MoveRequest.query.filter_by(user_id=user_id).all()
+    return jsonify([{
+        "id": r.id,
+        "from": r.from_location,
+        "to": r.to_location,
+        "move_date": r.move_date
+    } for r in requests])
 
-    if not user:
-        return jsonify({"error": "User not found"}), 404
 
-    data = request.json
-    user.full_name = data.get("full_name", user.full_name)
-    user.email = data.get("email", user.email)
+@main.route("/user/inventory", methods=["GET"])
+@jwt_required()
+def get_inventory():
+    user_id = get_jwt_identity()["id"]
+    checklist = InventoryChecklist.query.filter_by(user_id=user_id).all()
+    return jsonify([{
+        "id": i.id,
+        "items": i.items
+    } for i in checklist])
 
-    db.session.commit()
 
-    return jsonify({"message": "Profile updated successfully"})
+@main.route("/user/quotes", methods=["GET"])
+@jwt_required()
+def get_quotes():
+    user_id = get_jwt_identity()["id"]
+    quotes = QuoteApproval.query.filter_by(user_id=user_id).all()
+    return jsonify([{
+        "id": q.id,
+        "quote_amount": q.quote_amount,
+        "is_approved": q.is_approved
+    } for q in quotes])
+
+
+@main.route("/user/bookings", methods=["GET"])
+@jwt_required()
+def get_bookings():
+    user_id = get_jwt_identity()["id"]
+    bookings = Booking.query.filter_by(user_id=user_id).all()
+    return jsonify([{
+        "id": b.id,
+        "quote_id": b.quote_id,
+        "date": b.date,
+        "time": b.time,
+        "confirmed": b.confirmed
+    } for b in bookings])
+
+@main.route("/admin/users", methods=["GET"])
+@jwt_required()
+@admin_required
+def admin_get_users():
+    users = User.query.all()
+    return jsonify([{
+        "id": u.id,
+        "name": u.full_name,
+        "email": u.email,
+        "is_admin": u.is_admin
+    } for u in users])
+
+
+@main.route("/admin/move-requests", methods=["GET"])
+@jwt_required()
+@admin_required
+def admin_get_move_requests():
+    requests = MoveRequest.query.all()
+    return jsonify([{
+        "id": r.id,
+        "user_id": r.user_id,
+        "from": r.from_location,
+        "to": r.to_location,
+        "move_date": r.move_date
+    } for r in requests])
+
+
+@main.route("/admin/quotes", methods=["GET"])
+@jwt_required()
+@admin_required
+def admin_get_quotes():
+    quotes = QuoteApproval.query.all()
+    return jsonify([{
+        "id": q.id,
+        "user_id": q.user_id,
+        "quote_amount": q.quote_amount,
+        "is_approved": q.is_approved
+    } for q in quotes])
+
+
+@main.route("/admin/bookings", methods=["GET"])
+@jwt_required()
+@admin_required
+def admin_get_bookings():
+    bookings = Booking.query.all()
+    return jsonify([{
+        "id": b.id,
+        "user_id": b.user_id,
+        "quote_id": b.quote_id,
+        "date": b.date,
+        "time": b.time,
+        "confirmed": b.confirmed
+    } for b in bookings])
+
+
+
+
 
 def send_email(to, subject, content):
     msg = EmailMessage()
@@ -226,5 +245,3 @@ def send_email(to, subject, content):
 
     with smtplib.SMTP("localhost") as server:
         server.send_message(msg)
-
-   

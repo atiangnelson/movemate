@@ -1,59 +1,49 @@
 import React, { useState } from "react";
+import { registerUser } from "../api";
 import { useNavigate } from "react-router-dom";
-import { signup } from "../api";             
-import { setToken } from "../utils/auth";    
 
-function Signup() {
-  const [fullName, setFullName] = useState("");
+const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
-
-    const res = await signup(fullName, email, password);
-
-    if (res.token) {
-      setToken(res.token); 
-      navigate("/dashboard"); 
-    } else {
-      setError(res.message || "Signup failed");
+    try {
+      await registerUser({ email, password });
+      setMessage("Signup successful! You can now log in.");
+      setEmail("");
+      setPassword("");
+      setTimeout(() => navigate("/login"), 2000); // redirect after 2s
+    } catch (err) {
+      setMessage("Signup failed. Try again.");
     }
   };
 
   return (
-    <div className="form-container">
-      <h2>Sign Up</h2>
+    <div className="container">
+      <h2>Signup</h2>
+      {message && <p>{message}</p>}
       <form onSubmit={handleSignup}>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          required
-        />
         <input
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
           required
-        />
+          onChange={(e) => setEmail(e.target.value)}
+        /><br />
         <input
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
           required
-        />
-        <button type="submit" className="button-primary">Sign Up</button>
+          onChange={(e) => setPassword(e.target.value)}
+        /><br />
+        <button type="submit">Signup</button>
       </form>
     </div>
   );
-}
+};
 
 export default Signup;
