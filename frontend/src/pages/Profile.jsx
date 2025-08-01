@@ -1,67 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { getProfile, updateProfile } from '../api';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getUserProfile } from "../api";
 
 const Profile = () => {
-  const [profile, setProfile] = useState({ full_name: "", email: "" });
-  const [message, setMessage] = useState("");
-  const token = localStorage.getItem("token");
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    async function fetchProfile() {
-      try {
-        const data = await getProfile(token);
-        setProfile(data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    fetchProfile();
-  }, [token]);
+    const token = localStorage.getItem("token");
+    if (!token) return navigate("/login");
 
-  const handleChange = (e) => {
-    setProfile({ ...profile, [e.target.name]: e.target.value });
-  };
+    getUserProfile(token)
+      .then(data => setUser(data))
+      .catch(err => console.error("Failed to load profile", err));
+  }, [navigate]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await updateProfile(profile, token);
-      setMessage(" Profile updated successfully");
-    } catch (err) {
-      console.error(err);
-      setMessage(" Error updating profile");
-    }
-  };
+  if (!user) return <p>Loading profile...</p>;
 
   return (
-    <div className='page-container'>
-      <h2>My Profile</h2>
-
-      <form onSubmit={handleSubmit} className='form'>
-        <label>
-          Full Name:
-          <input
-            type="text"
-            name="full_name"
-            value={profile.full_name}
-            onChange={handleChange}
-          />
-        </label>
-
-        <label>
-          Email:
-          <input
-            type="email"
-            name="email"
-            value={profile.email}
-            onChange={handleChange}
-          />
-        </label>
-
-        <button type="submit">Save Changes</button>
-      </form>
-
-      {message && <p>{message}</p>}
+    <div className="container">
+      <h2>User Profile</h2>
+      <p><strong>Name:</strong> {user.name}</p>
+      <p><strong>Email:</strong> {user.email}</p>
+      <p><strong>Phone:</strong> {user.phone}</p>
+    
     </div>
   );
 };

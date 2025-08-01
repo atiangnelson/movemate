@@ -1,49 +1,68 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
-import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
+
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Dashboard from "./pages/Dashboard";
-import MoveRequestForm from "./pages/MoveRequestForm";
-import InventoryChecklist from "./pages/InventoryChecklist";
 import QuoteApproval from "./pages/QuoteApproval";
-import BookingConfirmation from "./pages/BookingConfirmation";
-import Profile from "./pages/Profile";
+import InventoryChecklist from "./pages/InventoryChecklist";
 import Notifications from "./pages/Notifications";
-import AdminPanel from "./pages/AdminPanel";
+import Booking from "./pages/Booking";
+import Profile from "./pages/Profile";
+import UsersAdmin from "./pages/admin/UsersAdmin";
+import MoveRequestsAdmin from "./pages/admin/MoveRequestsAdmin";
+import QuotesAdmin from "./pages/admin/QuotesAdmin";
+import BookingsAdmin from "./pages/admin/BookingsAdmin";
+import MoveRequestForm from "./pages/MoveRequestForm";
 
-import { getToken } from "./utils/auth";
-import "./App.css";
 
-function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!getToken());
-
-  useEffect(() => {
-    setIsLoggedIn(!!getToken()); 
-  }, []);
+const App = () => {
+  const token = localStorage.getItem("token");
 
   return (
     <Router>
-      
-      <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+        
+        <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/request-move" element={<MoveRequestForm />} />
 
-        <Route path="/dashboard" element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />} />
-        <Route path="/move-request" element={isLoggedIn ? <MoveRequestForm /> : <Navigate to="/login" />} />
-        <Route path="/inventory-checklist" element={isLoggedIn ? <InventoryChecklist /> : <Navigate to="/login" />} />
-        <Route path="/quote-approval" element={isLoggedIn ? <QuoteApproval /> : <Navigate to="/login" />} />
-        <Route path="/booking-confirmation" element={isLoggedIn ? <BookingConfirmation /> : <Navigate to="/login" />} />
-        <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
-        <Route path="/notifications" element={isLoggedIn ? <Notifications /> : <Navigate to="/login" />} />
-        <Route path="/admin" element={isLoggedIn ? <AdminPanel /> : <Navigate to="/login" />} />
+        
+        <Route
+          path="/"
+          element={token ? <QuoteApproval /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/inventory"
+          element={token ? <InventoryChecklist /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/notifications"
+          element={token ? <Notifications /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/booking"
+          element={token ? <Booking /> : <Navigate to="/login" />}
+        />
+        <Route path="/dashboard" element={<UserDashboard />} />
+        <Route path="/admin/users" element={<UsersAdmin />} />
+        <Route path="/admin/move-requests" element={<MoveRequestsAdmin />} />
+        <Route path="/admin/quotes" element={<QuotesAdmin />} />
+        <Route path="/admin/bookings" element={<BookingsAdmin />} />
+
+
+
+        
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+      <Route
+               path="/profile"
+                element={token ? <Profile /> : <Navigate to="/login" />}
+       
+       
+/>
     </Router>
   );
-}
+};
 
 export default App;

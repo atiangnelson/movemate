@@ -1,38 +1,33 @@
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { clearToken } from "../utils/auth"; 
 
-function Navbar({ isLoggedIn, setIsLoggedIn }) {
+const Navbar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    clearToken(); 
-    setIsLoggedIn(false);
-    navigate("/");
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   return (
     <nav className="navbar">
-      <div className="navbar-logo">MoveMate</div>
-      <ul className="navbar-links">
-        <li><Link to="/">Home</Link></li>
-        {isLoggedIn ? (
-          <>
-            <li><Link to="/dashboard">Dashboard</Link></li>
-            <li>
-              <button onClick={handleLogout} className="logout-button">
-                Logout
-              </button>
-            </li>
-          </>
-        ) : (
-          <>
-            <li><Link to="/login">Login</Link></li>
-            <li><Link to="/signup">Sign Up</Link></li>
-          </>
-        )}
-      </ul>
+      <Link to="/inventory">Inventory</Link>
+      <Link to="/quotes">Quotes</Link>
+      <Link to="/notifications">Notifications</Link>
+      <Link to="/request-move" className="btn btn-primary">
+  Request a Move
+</Link>
+
+      <Link to="/booking">Booking</Link>
+      {user?.is_admin && (
+  <Link to="/admin/users" className="px-4 py-2">Admin Panel</Link>
+)}
+
+       <li><a href="/profile">Profile</a></li>
+       {token && <li><Link to="/dashboard">Dashboard</Link></li>}
+       <button onClick={handleLogout}>Logout</button>
     </nav>
   );
-}
+};
 
 export default Navbar;

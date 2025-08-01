@@ -1,9 +1,8 @@
 import React, { useState } from "react";
+import { loginUser } from "../api";
 import { useNavigate } from "react-router-dom";
-import { login } from "../api";              
-import { setToken } from "../utils/auth";    
 
-function Login({ setIsLoggedIn }) {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -11,41 +10,38 @@ function Login({ setIsLoggedIn }) {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    const response = await login(email, password);
-
-    if (response.token) {
-      setToken(response.token);
-      setIsLoggedIn(true);
-      navigate("/dashboard");
-    } else {
-      setError(response.message || "Login failed");
+    try {
+      const data = await loginUser({ email, password });
+      localStorage.setItem("token", data.token);
+      navigate("/"); // redirect to homepage or dashboard
+    } catch (err) {
+      setError("Invalid email or password");
     }
   };
 
   return (
-    <div className="form-container">
+    <div className="container">
       <h2>Login</h2>
+      {error && <p className="error">{error}</p>}
       <form onSubmit={handleLogin}>
-        {error && <p style={{ color: "red" }}>{error}</p>}
         <input
           type="email"
           placeholder="Email"
-          required
           value={email}
+          required
           onChange={(e) => setEmail(e.target.value)}
-        />
+        /><br />
         <input
           type="password"
           placeholder="Password"
-          required
           value={password}
+          required
           onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit" className="button-primary">Login</button>
+        /><br />
+        <button type="submit">Login</button>
       </form>
     </div>
   );
-}
+};
 
 export default Login;

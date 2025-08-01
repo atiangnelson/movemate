@@ -1,42 +1,82 @@
-import React, { useState } from 'react';
-import { submitMoveRequest } from '../api';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const MoveRequestForm = () => {
   const [formData, setFormData] = useState({
-    full_name: '',
-    location: '',
-    date: '',
-    inventory: ''
+    from_location: "",
+    to_location: "",
+    move_date: "",
   });
-  const [message, setMessage] = useState('');
 
-  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    const res = await submitMoveRequest(formData, token);
-    if (res.move_id) {
-      setMessage('Move request submitted!');
-    } else {
-      setMessage('Something went wrong.');
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/move-request`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert("Move request submitted successfully!");
+        navigate("/dashboard");
+      } else {
+        alert(data.message || "Failed to submit move request.");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Server error.");
     }
   };
 
   return (
-    <div className="page-container">
+    <div className="container">
       <h2>Request a Move</h2>
       <form onSubmit={handleSubmit}>
-        <input type="text" name="full_name" placeholder="Full Name" value={formData.full_name} onChange={handleChange} required />
-        <input type="text" name="location" placeholder="Location" value={formData.location} onChange={handleChange} required />
-        <input type="date" name="date" value={formData.date} onChange={handleChange} required />
-        <textarea name="inventory" placeholder="Inventory list..." value={formData.inventory} onChange={handleChange} required />
-        <button type="submit">Submit</button>
+        <label>
+          From:
+          <input
+            type="text"
+            name="from_location"
+            value={formData.from_location}
+            onChange={handleChange}
+            required
+          />
+        </label>
+        <label>
+          To:
+          <input
+            type="text"
+            name="to_location"
+            value={formData.to_location}
+            onChange={handleChange}
+            required
+          />
+        </label>
+        <label>
+          Move Date:
+          <input
+            type="date"
+            name="move_date"
+            value={formData.move_date}
+            onChange={handleChange}
+            required
+          />
+        </label>
+        <button type="submit">Submit Request</button>
       </form>
-      {message && <p>{message}</p>}
     </div>
   );
 };

@@ -5,6 +5,7 @@ class User(db.Model):
     full_name = db.Column(db.String(100))
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(200))
+    is_admin = db.Column(db.Boolean, default=False)
 
 class MoveRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
